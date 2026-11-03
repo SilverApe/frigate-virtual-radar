@@ -1,0 +1,55 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Frigate camera as virtual radar",
+        "description": "Turns the Frigate person boxes of one camera into X/Y targets for Radar Map Manager. Paste the calibration from the calibration tool; you can also leave it empty and add it later under Configure.",
+        "data": {
+          "camera": "Frigate camera",
+          "radar_name": "Radar name in RMM",
+          "max_targets": "Max. persons",
+          "person_labels": "Labels that count as person",
+          "dog_label": "Dog label (empty = no dog sensors)",
+          "max_dogs": "Max. dogs",
+          "min_move": "Minimum movement before an update",
+          "stale_timeout": "Forget an object after",
+          "topic": "Frigate events topic",
+          "calibration": "Calibration (JSON from the calibration tool)"
+        },
+        "data_description": {
+          "radar_name": "Lowercase letters, digits and _. Gives sensor.<name>_target_1_x; in RMM you add the radar with this name.",
+          "person_labels": "Comma separated, e.g. person",
+          "stale_timeout": "Safety net only: Frigate normally reports when an object is gone.",
+          "calibration": "Four or more floor points: pixel in the camera image and position on the floor plan."
+        }
+      }
+    },
+    "error": {
+      "invalid_name": "Use lowercase letters, digits and _ only, starting with a letter.",
+      "invalid_calibration": "The calibration could not be read or its points do not lie on one floor plane. Copy it again from the calibration tool."
+    },
+    "abort": {
+      "already_configured": "A virtual radar with this name already exists."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Virtual radar settings",
+        "data": {
+          "max_targets": "Max. persons",
+          "person_labels": "Labels that count as person",
+          "dog_label": "Dog label (empty = no dog sensors)",
+          "max_dogs": "Max. dogs",
+          "min_move": "Minimum movement before an update",
+          "stale_timeout": "Forget an object after",
+          "topic": "Frigate events topic",
+          "calibration": "Calibration (JSON from the calibration tool)"
+        }
+      }
+    },
+    "error": {
+      "invalid_calibration": "The calibration could not be read or its points do not lie on one floor plane. Copy it again from the calibration tool."
+    }
+  }
+}
