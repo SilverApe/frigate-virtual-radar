@@ -48,13 +48,15 @@ Alles behalve camera en radarnaam pas je later aan via **Configureren**.
     {"img": [1290, 520], "plan": [7.80, 3.40]},
     {"img": [640, 505], "plan": [4.95, 3.35]}
   ],
-  "origin": [6.40, 9.90]
+  "origin": [6.40, 9.90],
+  "lens": {"k1": -0.22}
 }
 ```
 
 - `image_size`: de **detect**-resolutie van de camera in Frigate.
 - `img`: pixels in die resolutie. `plan`: meters op de plattegrond (X naar rechts, Y naar beneden, zoals de PNG).
 - `origin`: de plek van de camera op de plattegrond. Dit wordt het nulpunt van de virtuele radar.
+- `lens.k1`: lenscorrectie voor groothoekcamera's (tonvervorming), eenparameter-delingsmodel rond het beeldmidden. `0` = geen correctie. De `img`-punten zijn dan de *gecorrigeerde* pixels; binnenkomende Frigate-pixels worden eerst met dezelfde `k1` gecorrigeerd.
 - Vier of meer punten, op de vloer, niet drie op één lijn. Bij meer punten wordt de beste passing berekend.
 
 ## Sensoren

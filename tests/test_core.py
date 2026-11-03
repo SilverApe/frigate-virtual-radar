@@ -19,7 +19,7 @@ for mod in ("geometry", "tracker"):
     sys.modules[f"fvr.{mod}"] = m
     spec.loader.exec_module(m)
 
-from fvr.geometry import CalibrationError, apply, foot_point, homography, parse_calibration  # noqa: E402
+from fvr.geometry import CalibrationError, apply, foot_point, homography, parse_calibration, undistort  # noqa: E402
 from fvr.tracker import VirtualRadar  # noqa: E402
 
 
@@ -66,6 +66,20 @@ def test_radar_frame_inverts_y():
     _, text = make_cal(origin=(2.0, 6.0))
     cal = parse_calibration(text)
     assert cal.to_radar_cm(3.0, 5.0) == (100.0, 100.0)  # 1 m right, 1 m up (plan Y is down)
+
+
+def test_lens_correction():
+    # centre is unchanged, a corner moves outward for barrel correction (k1 < 0)
+    assert undistort(960, 540, -0.3, (1920, 1080)) == (960.0, 540.0)
+    u, v = undistort(1900, 1060, -0.3, (1920, 1080))
+    assert u > 1900 and v > 1060
+    assert undistort(100, 100, 0.0, (1920, 1080)) == (100, 100)
+    # with k1 the raw pixel is undistorted before the homography
+    H, text = make_cal()
+    data = json.loads(text); data["lens"] = {"k1": -0.2}
+    cal = parse_calibration(json.dumps(data))
+    uu, vv = undistort(1800, 1000, -0.2, (1920, 1080))
+    assert math.dist(cal.to_plan(1800, 1000), apply(H, uu, vv)) < 1e-6
 
 
 def ev(t, fid, label="person", box=(900, 400, 1000, 900), camera="camera_01", **kw):

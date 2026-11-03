@@ -68,18 +68,43 @@ def apply(h: list[float], u: float, v: float) -> tuple[float, float] | None:
     return x, y
 
 
+def undistort(u: float, v: float, k1: float, image_size: tuple[int, int]) -> tuple[float, float]:
+    """Remove radial (barrel/pincushion) lens distortion with the one-parameter division model.
+
+    p_u = c + (p_d - c) / (1 + k1 * r^2), with r the distance to the image centre c divided by
+    half the image width. k1 < 0 straightens barrel distortion (wide-angle lenses), 0 = no change.
+    The calibration tool uses exactly the same formula.
+    """
+    if not k1:
+        return u, v
+    w, h = image_size
+    cx, cy, n = w / 2.0, h / 2.0, w / 2.0
+    dx, dy = u - cx, v - cy
+    d = 1.0 + k1 * ((dx * dx + dy * dy) / (n * n))
+    if d <= 0.05:
+        d = 0.05
+    return cx + dx / d, cy + dy / d
+
+
 @dataclass(frozen=True)
 class Calibration:
-    """A parsed calibration as produced by the calibration tool."""
+    """A parsed calibration as produced by the calibration tool.
+
+    Point pairs hold *undistorted* image pixels; incoming Frigate pixels are undistorted
+    with the same k1 before the homography is applied.
+    """
 
     image_size: tuple[int, int]
     pairs: tuple[tuple[tuple[float, float], tuple[float, float]], ...]
     origin: tuple[float, float]
     matrix: tuple[float, ...]
     camera: str | None = None
+    k1: float = 0.0
 
     def to_plan(self, u: float, v: float) -> tuple[float, float] | None:
-        return apply(list(self.matrix), u, v)
+        """Raw Frigate pixel -> plan metres."""
+        uu, vv = undistort(u, v, self.k1, self.image_size)
+        return apply(list(self.matrix), uu, vv)
 
     def to_radar_cm(self, plan_x: float, plan_y: float) -> tuple[float, float]:
         """Plan metres -> RMM radar frame in cm (radar at the origin, rotation 0).
@@ -94,7 +119,7 @@ class Calibration:
         """Largest distance (m) between a calibration point and where the homography puts it."""
         err = 0.0
         for (u, v), (x, y) in self.pairs:
-            p = self.to_plan(u, v)
+            p = apply(list(self.matrix), u, v)  # pairs are already undistorted
             if p is None:
                 return math.inf
             err = max(err, math.hypot(p[0] - x, p[1] - y))
@@ -117,13 +142,16 @@ def parse_calibration(text: str) -> Calibration:
             for p in data["points"]
         )
         origin = (float(data["origin"][0]), float(data["origin"][1]))
+        k1 = float((data.get("lens") or {}).get("k1", 0.0))
     except (KeyError, TypeError, IndexError, ValueError) as err:
         raise CalibrationError("expected image_size, points[{img, plan}] and origin") from err
     if image_size[0] <= 0 or image_size[1] <= 0:
         raise CalibrationError("image_size must be positive")
     h = homography(list(pairs))
+    if not -1.0 <= k1 <= 1.0:
+        raise CalibrationError("lens k1 must be between -1 and 1")
     cal = Calibration(image_size=image_size, pairs=pairs, origin=origin, matrix=tuple(h),
-                      camera=data.get("camera"))
+                      camera=data.get("camera"), k1=k1)
     if cal.reprojection_error_m() > 0.05:
         raise CalibrationError("points do not fit one floor plane (error above 5 cm)")
     return cal
