@@ -1,4 +1,4 @@
-"""Fixtures for the Home Assistant tests (run in GitHub Actions)."""
+"""Test fixtures: real Home Assistant via pytest-homeassistant-custom-component (GitHub Actions)."""
 import pytest
 
 pytest_plugins = "pytest_homeassistant_custom_component"
