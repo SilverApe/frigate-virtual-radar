@@ -17,7 +17,7 @@
           "calibration": "Kalibratie (JSON uit de kalibratietool)"
         },
         "data_description": {
-          "radar_name": "Kleine letters, cijfers en _. Geeft sensor.<naam>_target_1_x; in RMM voeg je de radar toe met deze naam.",
+          "radar_name": "Kleine letters, cijfers en _. Bijv. cam01 geeft sensor.cam01_target_1_x; in RMM voeg je de radar toe met deze naam.",
           "person_labels": "Komma-gescheiden, bijv. person",
           "stale_timeout": "Alleen als vangnet: Frigate meldt normaal zelf wanneer een object weg is.",
           "calibration": "Vier of meer vloerpunten: pixel in het camerabeeld en plek op de plattegrond."

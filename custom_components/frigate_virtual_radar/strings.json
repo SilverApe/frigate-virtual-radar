@@ -17,7 +17,7 @@
           "calibration": "Calibration (JSON from the calibration tool)"
         },
         "data_description": {
-          "radar_name": "Lowercase letters, digits and _. Gives sensor.<name>_target_1_x; in RMM you add the radar with this name.",
+          "radar_name": "Lowercase letters, digits and _. E.g. cam01 gives sensor.cam01_target_1_x; in RMM you add the radar with this name.",
           "person_labels": "Comma separated, e.g. person",
           "stale_timeout": "Safety net only: Frigate normally reports when an object is gone.",
           "calibration": "Four or more floor points: pixel in the camera image and position on the floor plan."
