@@ -4,7 +4,10 @@ from __future__ import annotations
 import re
 from typing import Any
 
-import voluptuous as vol
+try:  # Home Assistant 2026.10+ validates with probatio
+    import probatio as vol
+except ImportError:  # older releases still use voluptuous
+    import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.core import callback
