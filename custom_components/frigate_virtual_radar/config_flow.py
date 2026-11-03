@@ -35,8 +35,10 @@ def _frigate_cameras(hass) -> list[str]:
 
 
 def _int(lo: int, hi: int, step: int = 1, unit: str | None = None) -> NumberSelector:
-    return NumberSelector(NumberSelectorConfig(min=lo, max=hi, step=step, mode=NumberSelectorMode.BOX,
-                                               unit_of_measurement=unit))
+    cfg = NumberSelectorConfig(min=lo, max=hi, step=step, mode=NumberSelectorMode.BOX)
+    if unit:  # HA 2026.10 rejects unit_of_measurement=None
+        cfg["unit_of_measurement"] = unit
+    return NumberSelector(cfg)
 
 
 def _tuning_schema(d: dict) -> dict:
